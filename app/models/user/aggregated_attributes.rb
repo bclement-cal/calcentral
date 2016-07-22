@@ -11,10 +11,18 @@ module User
 
     def get_feed
       @ldap_attributes = CalnetLdap::UserAttributes.new(user_id: @uid).get_feed
+
+      # Temporary assignments for development
+      @ldap_attributes[:departmentnumber] ||= ["CLLAW"]
+      @ldap_attributes[:berkeleyeduprimarydeptunit] ||= ["CLLAW"]
+      @ldap_attributes[:berkeleyeduunitcalnetdeptname] ||= ["Law"]
+      @ldap_attributes[:berkeleyeduunithrdeptname] ||= ["Law"]
+
       @oracle_attributes = CampusOracle::UserAttributes.new(user_id: @uid).get_feed
       @edo_attributes = HubEdos::UserAttributes.new(user_id: @uid).get if is_cs_profile_feature_enabled
       campus_solutions_student = @edo_attributes.present? && (@edo_attributes[:is_legacy_user] == false)
       @sis_profile_visible = is_cs_profile_feature_enabled && (campus_solutions_student || is_profile_visible_for_legacy_users)
+      # @departments = get_departments
       @roles = get_campus_roles
       first_name = get_campus_attribute('first_name', :string) || ''
       last_name = get_campus_attribute('last_name', :string) || ''
@@ -31,14 +39,24 @@ module User
         campusSolutionsId: get_campus_attribute('campus_solutions_id', :string),
         primaryEmailAddress: get_campus_attribute('email_address', :string),
         officialBmailAddress: get_campus_attribute('official_bmail_address', :string),
-        educationAbroad: !!@oracle_attributes[:education_abroad]
+        educationAbroad: !!@oracle_attributes[:education_abroad],
+        departments: get_departments # @departments
       }
     end
 
     private
 
+    def get_departments
+      @ldap_attributes[:departmentnumber] ||
+        @ldap_attributes[:berkeleyeduprimarydeptunit] ||
+        @ldap_attributes[:berkeleyeduunitcalnetdeptname] ||
+        @ldap_attributes[:berkeleyeduunithrdeptname] ||
+        []
+    end
+
     def get_campus_roles
       ldap_roles = (@ldap_attributes && @ldap_attributes[:roles]) || {}
+      # ldap_roles[:law] = @departments.include?("CLLAW") || @departments.include?("Law")
       oracle_roles = (@oracle_attributes && @oracle_attributes[:roles]) || {}
       campus_roles = oracle_roles.merge ldap_roles
       if @sis_profile_visible

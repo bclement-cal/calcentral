@@ -5,7 +5,7 @@ var angular = require('angular');
 /**
  * Campus Links Factory
  */
-angular.module('calcentral.factories').factory('campusLinksFactory', function(apiService, $http) {
+angular.module('calcentral.factories').factory('campusLinksFactory', function(apiService, badgesFactory, $http) {
   // Data contains "links" and "navigation"
   var linkDataUrl = '/api/my/campuslinks';
 
@@ -31,16 +31,33 @@ angular.module('calcentral.factories').factory('campusLinksFactory', function(ap
     }
   };
 
+  // Needed?
+  var isLawStudent = function() {
+    return badgesFactory.getBadges().success(function(data) {
+      return data.isLawStudent;
+    });
+  };
+
   /**
    * Depending on the roles, determine whether the current user should be able to view the link
    * @param {Object} link Link object
    * @return {Boolean} Whether the user should be able to view the link
    */
   var canViewLink = function(link) {
+    var profile = apiService.user.profile;
+
+    if (profile.inLawDepartment) {
+      if (link.roles.lawHide) {
+        return false;
+      }
+    } else if (link.roles.lawOnly) {
+      return false;
+    }
+
     for (var i in link.roles) {
       if (link.roles.hasOwnProperty(i) &&
           link.roles[i] === true &&
-          link.roles[i] === apiService.user.profile.roles[i]) {
+          link.roles[i] === profile.roles[i]) {
         return true;
       }
     }

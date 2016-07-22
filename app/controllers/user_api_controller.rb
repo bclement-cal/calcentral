@@ -46,6 +46,8 @@ class UserApiController < ApplicationController
         :youtubeSplashId => Settings.youtube_splash_id
       })
     end
+    # Temporarily force ExStudent role on the user
+    status[:roles][:exStudent] = true
     render :json => status.to_json
   end
 

@@ -20,6 +20,9 @@ module Links
       applicant = Links::UserRole.find_or_create_by(name: 'Applicant') {|ur| ur.slug = 'applicant'}
       staff = Links::UserRole.find_or_create_by(name: 'Staff') {|ur| ur.slug = 'staff'}
       faculty = Links::UserRole.find_or_create_by(name: 'Faculty') {|ur| ur.slug = 'faculty'}
+      # law = Links::UserRole.find_or_create_by(name: 'Law') {|ur| ur.slug = 'law'}
+      lawOnly = Links::UserRole.find_or_create_by(name: 'Law Only') {|ur| ur.slug = 'lawOnly'}
+      lawHide = Links::UserRole.find_or_create_by(name: 'Hide from Law') {|ur| ur.slug = 'lawHide'}
 
       begin
         file = File.open("#{Rails.root}#{filename}")
@@ -69,6 +72,15 @@ module Links
             end
             if link_node["roles"]["staff"]
               roles << staff.id
+            end
+            # if link_node["roles"]["law"]
+            #   roles << law.id
+            # end
+            if link_node["roles"]["lawOnly"]
+              roles << lawOnly.id
+            end
+            if link_node["roles"]["lawHide"]
+              roles << lawHide.id
             end
           end
 

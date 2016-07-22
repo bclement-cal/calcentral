@@ -151,6 +151,8 @@ module User
       # This tangled logic is a historical artifact of divergent approaches to View-As and LTI-based authentication.
       acting_as_uid = directly_authenticated || authentication_state.authenticated_as_delegate? || authentication_state.authenticated_as_advisor? ?
         false : authentication_state.real_user_id
+      departments = @user_attributes[:departments]
+      in_law_department =  departments.include?("CLLAW") || departments.include?("Law")
       feed = {
         isSuperuser: current_user_policy.can_administrate?,
         isViewer: current_user_policy.can_view_as?,
@@ -188,7 +190,9 @@ module User
         advisorActingAsUid: !directly_authenticated && authentication_state.original_advisor_user_id,
         delegateActingAsUid: !directly_authenticated && authentication_state.original_delegate_user_id,
         canSeeCSLinks: directly_authenticated || authentication_state.classic_viewing_as?,
-        canActOnFinances: directly_authenticated
+        canActOnFinances: directly_authenticated,
+        departments: departments,
+        inLawDepartment: in_law_department
       }
       filter_user_api_for_delegator(feed) if authentication_state.authenticated_as_delegate?
       feed

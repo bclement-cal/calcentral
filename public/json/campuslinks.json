@@ -5,6 +5,48 @@
       "description": "Calculates transportation options for traveling",
       "url": "http://www.511.org/",
       "roles": {
+        "student": false,
+        "applicant": true,
+        "staff": false,
+        "faculty": false,
+        "exStudent": true,
+        // "law": false
+        "lawOnly": false,
+        "lawHide": true
+      },
+      "categories": [
+        {
+          "topcategory": "Academic Departments 2",
+          "subcategory": "Ex || Applicant (Hide from Law)"
+        }
+      ]
+    },
+    {
+      "name": "511.org (Bay Area Transportation Planner)",
+      "description": "Calculates transportation options for traveling",
+      "url": "http://www.511.org/",
+      "roles": {
+        "student": false,
+        "applicant": false,
+        "staff": false,
+        "faculty": false,
+        "exStudent": true,
+        // "law": true
+        "lawOnly": true,
+        "lawHide": false
+      },
+      "categories": [
+        {
+          "topcategory": "Academic Departments 2",
+          "subcategory": "Law Ex Only"
+        }
+      ]
+    },
+    {
+      "name": "511.org (Bay Area Transportation Planner)",
+      "description": "Calculates transportation options for traveling",
+      "url": "http://www.511.org/",
+      "roles": {
         "student": true,
         "applicant": true,
         "staff": true,
@@ -3672,6 +3714,19 @@
         {
           "id": "stafflearning",
           "name": "Staff Learning"
+        }
+      ]
+    },
+    {
+      "label": "Academic2",
+      "categories": [
+        {
+          "id": "academicdepartments2",
+          "name": "Academic Departments 2"
+        },
+        {
+          "id": "academicplanning2",
+          "name": "Academic Planning 2"
         }
       ]
     },

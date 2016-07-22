@@ -50,6 +50,7 @@ module Links
       end
       categories.sort_by { |category| category['name'] }
     end
+
     # Given a link, return an array of the categories it lives in by examining its host sections
     def get_cats_for_link(link)
       categories = []
@@ -71,7 +72,12 @@ module Links
         'applicant' => false,
         'staff' => false,
         'faculty' => false,
-        'exStudent' => false
+        'exStudent' => false,
+        # lawOnly and lawHide roles for links instead?
+        # Users only have a law role
+        # 'law' => false
+        'lawOnly' => false,
+        'lawHide' => false
       }
       link.user_roles.each { |link_role| roles[link_role.slug] = true }
       roles
