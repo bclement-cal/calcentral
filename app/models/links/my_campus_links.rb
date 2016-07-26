@@ -73,8 +73,6 @@ module Links
         'staff' => false,
         'faculty' => false,
         'exStudent' => false,
-        # lawOnly and lawHide roles for links instead?
-        # Users only have a law role
         # 'law' => false
         'lawOnly' => false,
         'lawHide' => false

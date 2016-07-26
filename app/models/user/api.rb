@@ -149,10 +149,15 @@ module User
       can_view_academics = has_academics_tab?(roles, has_instructor_history, has_student_history)
       directly_authenticated = authentication_state.directly_authenticated?
       # This tangled logic is a historical artifact of divergent approaches to View-As and LTI-based authentication.
-      acting_as_uid = directly_authenticated || authentication_state.authenticated_as_delegate? || authentication_state.authenticated_as_advisor? ?
-        false : authentication_state.real_user_id
-      departments = @user_attributes[:departments]
-      in_law_department =  departments.include?("CLLAW") || departments.include?("Law")
+      acting_as_uid = directly_authenticated || authentication_state.authenticated_as_delegate? ||
+                      authentication_state.authenticated_as_advisor? ? false : authentication_state.real_user_id
+      # departments = @user_attributes[:departments]
+      department_number = @user_attributes[:departmentNumber]
+      primary_dept_unit = @user_attributes[:primaryDeptUnit]
+      unit_calnet_dept_name = @user_attributes[:unitCalnetDeptName]
+      unit_hr_dept_name = @user_attributes[:unitHrDeptName]
+      in_law_department =  department_number.include?("CLLAW") || primary_dept_unit.include?("CLLAW") ||
+                           unit_calnet_dept_name.include?("Law") || unit_hr_dept_name.include?("Law")
       feed = {
         isSuperuser: current_user_policy.can_administrate?,
         isViewer: current_user_policy.can_view_as?,
@@ -191,7 +196,11 @@ module User
         delegateActingAsUid: !directly_authenticated && authentication_state.original_delegate_user_id,
         canSeeCSLinks: directly_authenticated || authentication_state.classic_viewing_as?,
         canActOnFinances: directly_authenticated,
-        departments: departments,
+        # departments: departments,
+        departmentNumber: department_number,
+        primaryDeptUnit: primary_dept_unit,
+        unitCalnetDeptName: unit_calnet_dept_name,
+        unitHrDeptName: unit_hr_dept_name,
         inLawDepartment: in_law_department
       }
       filter_user_api_for_delegator(feed) if authentication_state.authenticated_as_delegate?
