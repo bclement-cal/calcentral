@@ -40,23 +40,14 @@ module User
         officialBmailAddress: get_campus_attribute('official_bmail_address', :string),
         educationAbroad: !!@oracle_attributes[:education_abroad],
         # Temporarily expose all department attributes until the most reliable one can be determined
-        # departments: get_departments
-        departmentNumber: get_campus_attribute('departmentnumber', :array) || [],
-        primaryDeptUnit: get_campus_attribute('berkeleyeduprimarydeptunit', :array) || [],
-        unitCalnetDeptName: get_campus_attribute('berkeleyeduunitcalnetdeptname', :array) || [],
-        unitHrDeptName: get_campus_attribute('berkeleyeduunithrdeptname', :array) || []
+        department: get_campus_attribute('departmentnumber', :array) || [],
+        primaryDepartment: get_campus_attribute('berkeleyeduprimarydeptunit', :array) || [],
+        calnetDepartment: get_campus_attribute('berkeleyeduunitcalnetdeptname', :array) || [],
+        hrDepartment: get_campus_attribute('berkeleyeduunithrdeptname', :array) || []
       }
     end
 
     private
-
-    # def get_departments
-    #   @ldap_attributes[:departmentnumber] ||
-    #     @ldap_attributes[:berkeleyeduprimarydeptunit] ||
-    #     @ldap_attributes[:berkeleyeduunitcalnetdeptname] ||
-    #     @ldap_attributes[:berkeleyeduunithrdeptname] ||
-    #     []
-    # end
 
     def get_campus_roles
       ldap_roles = (@ldap_attributes && @ldap_attributes[:roles]) || {}

@@ -111,6 +111,21 @@ module User
       policy.can_administrate? || authentication_state.real_user_auth.is_viewer? || is_delegate_user? || !!roles[:advisor]
     end
 
+    # True if user has a Law 'career' according to Campus Solutions, or if the first college is the School of Law.
+    # Copied from MyBadges::StudentInfo
+    def law_student?
+      if (college_feed = MyAcademics::CollegeAndLevel.new(@uid).merge({}))
+        if college_feed[:careers].present? && college_feed[:careers].include?('Law')
+          true
+        else
+          college_feed[:majors].present? &&
+            college_feed[:majors].first[:college] == Berkeley::Departments.get('CLLAW')
+        end
+      else
+        false
+      end
+    end
+
     def filter_user_api_for_delegator(feed)
       view_as_privileges = authentication_state.delegated_privileges
       feed[:delegateViewAsPrivileges] = view_as_privileges
@@ -151,13 +166,13 @@ module User
       # This tangled logic is a historical artifact of divergent approaches to View-As and LTI-based authentication.
       acting_as_uid = directly_authenticated || authentication_state.authenticated_as_delegate? ||
                       authentication_state.authenticated_as_advisor? ? false : authentication_state.real_user_id
-      # departments = @user_attributes[:departments]
-      department_number = @user_attributes[:departmentNumber]
-      primary_dept_unit = @user_attributes[:primaryDeptUnit]
-      unit_calnet_dept_name = @user_attributes[:unitCalnetDeptName]
-      unit_hr_dept_name = @user_attributes[:unitHrDeptName]
-      in_law_department =  department_number.include?("CLLAW") || primary_dept_unit.include?("CLLAW") ||
-                           unit_calnet_dept_name.include?("Law") || unit_hr_dept_name.include?("Law")
+      department = @user_attributes[:department]
+      primary_department = @user_attributes[:primaryDepartment]
+      calnet_department = @user_attributes[:calnetDepartment]
+      hr_department = @user_attributes[:hrDepartment]
+      is_law_student = law_student?
+      in_law_department = is_law_student || department.include?("CLLAW") || primary_department.include?("CLLAW") ||
+                          calnet_department.include?("Law") || hr_department.include?("Law")
       feed = {
         isSuperuser: current_user_policy.can_administrate?,
         isViewer: current_user_policy.can_view_as?,
@@ -196,12 +211,12 @@ module User
         delegateActingAsUid: !directly_authenticated && authentication_state.original_delegate_user_id,
         canSeeCSLinks: directly_authenticated || authentication_state.classic_viewing_as?,
         canActOnFinances: directly_authenticated,
-        # departments: departments,
-        departmentNumber: department_number,
-        primaryDeptUnit: primary_dept_unit,
-        unitCalnetDeptName: unit_calnet_dept_name,
-        unitHrDeptName: unit_hr_dept_name,
-        inLawDepartment: in_law_department
+        department: department,
+        primaryDepartment: primary_department,
+        calnetDepartment: calnet_department,
+        hrDepartment: hr_department,
+        inLawDepartment: in_law_department,
+        isLawStudent: is_law_student
       }
       filter_user_api_for_delegator(feed) if authentication_state.authenticated_as_delegate?
       feed

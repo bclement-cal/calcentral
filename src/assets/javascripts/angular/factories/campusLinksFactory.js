@@ -5,7 +5,7 @@ var angular = require('angular');
 /**
  * Campus Links Factory
  */
-angular.module('calcentral.factories').factory('campusLinksFactory', function(apiService, badgesFactory, $http) {
+angular.module('calcentral.factories').factory('campusLinksFactory', function(apiService, $http) {
   // Data contains "links" and "navigation"
   var linkDataUrl = '/api/my/campuslinks';
 
@@ -29,13 +29,6 @@ angular.module('calcentral.factories').factory('campusLinksFactory', function(ap
     for (var i = 0; i < link.categories.length; i++) {
       topcategories[link.categories[i].topcategory] = true;
     }
-  };
-
-  // Needed?
-  var isLawStudent = function() {
-    return badgesFactory.getBadges().success(function(data) {
-      return data.isLawStudent;
-    });
   };
 
   /**
