@@ -38,11 +38,7 @@ module Oec
       return unless csv && (parsed_csv = CSV.parse csv)
       instance = self.new opts
       (header_row = parsed_csv.shift) until (header_row == instance.headers || parsed_csv.empty?)
-      unless header_row == instance.headers
-        csv_snippet = csv[0..499]
-        csv_snippet << '...' if csv.length > 500
-        raise ArgumentError, "Header mismatch: cannot create instance of #{self.name} from CSV: '#{csv_snippet}'"
-      end
+      raise ArgumentError, "Header mismatch: cannot create instance of #{self.name} from CSV" unless header_row
       parsed_csv.each_with_index { |row, index| instance[index] = instance.parse_row row  }
       instance
     end
